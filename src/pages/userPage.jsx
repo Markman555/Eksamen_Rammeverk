@@ -1,27 +1,32 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetUsersQuery, useDeleteUserMutation } from '../features/apiSlice';
+import { useNavigate } from 'react-router-dom';
 
-const UsersPage = () => {
-    const { data: users, error, isLoading } = useGetUsersQuery();
-    const [deleteUser] = useDeleteUserMutation();
+const UserProfilePage = () => {
+  const { user } = useSelector((state) => state.auth);
+  const cv = useSelector((state) => state.cv);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    if (isLoading) return <p>Laster...</p>;
-    if (error) return <p>Det oppstod en feil!</p>;
+  useEffect(() => {
+    if (!user) {
+      navigate('/'); // Hvis ikke autentisert, gå til login
+    } else {
+      dispatch(fetchUserCV(user.id)); // Hent brukerens CV basert på ID
+    }
+  }, [dispatch, navigate, user]);
 
-    return (
-        <div>
-            <h1>Brukere</h1>
-            <ul>
-                {users.map((user) => (
-                    <li key={user._id}>
-                        {user.name} - {user.email}
-                        <button onClick={() => deleteUser(user._id)}>Slett</button>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+  const handleUpdateCV = (updatedCV) => {
+    dispatch(updateUserCV(updatedCV)); // Oppdater brukerens CV
+  };
+
+  return (
+    <div>
+      <h1>Min CV</h1>
+      <p>{cv.name}</p>
+      <button onClick={() => handleUpdateCV({ name: 'Updated Name' })}>Oppdater</button>
+    </div>
+  );
 };
 
-export default UsersPage;
+export default UserProfilePage;

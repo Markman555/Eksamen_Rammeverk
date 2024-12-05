@@ -80,4 +80,3 @@ export const {
     useUpdateCvMutation,
     useDeleteCvMutation,
 } = apiSlice;
-
