@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../features/authSlice';
 import { useGetUsersQuery, useDeleteUserMutation, useAddUserMutation } from '../features/apiSlice';
+import handleCreateUser from '../utils/userUtils'
 
 const AdminPanelPage = () => {
     const { user } = useSelector((state) => state.auth);
@@ -30,11 +31,15 @@ const AdminPanelPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const success = await handleCreateUser(newUser, addUser);  // Bruk funksjonen fra userUtils
-        if (success) {
-            setNewUser({ name: '', email: '', password: '', role: 'user' });
+        try {
+            await addUser(newUser).unwrap(); // Directly call addUser mutation
+            console.log('User created successfully');
+            setNewUser({ name: '', email: '', password: '', role: 'user' }); // Reset form
+        } catch (err) {
+            console.error('Error creating user:', err);
         }
     };
+    
 
     const handleLogout = () => {
         dispatch(logout());
