@@ -1,33 +1,65 @@
-import React, { createContext, useState, useContext } from "react";
-import { fetchUserByUsername } from "../Utils/api";  // Importer som named import
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { fetchUserByUsername } from "../Utils/api"; 
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null); // Starter med null
+    const [user, setUser] = useState(null); // user starter som null
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const admin = { username: "admin", password: "admin", role: "admin" };
 
     const login = async (username, password) => {
-        if (username === "admin" && password === "admin") {
-            setUser({ username: "admin", role: "admin" });  // Setter admin som bruker
+        setIsLoading(true);
+        setError(null);
+
+        console.log(`Logging in with username: ${username}, password: ${password}`);
+
+        // Sjekk om admin logger inn
+        if (username === admin.username && password === admin.password) {
+            console.log("Admin login successful");
+            setUser({ username: admin.username, role: admin.role });
+            setIsLoading(false);
             return true;
         }
 
-        const foundUser = await fetchUserByUsername(username);  // Sjekk om brukeren finnes
-        if (foundUser && foundUser.password === password) {
-            setUser({ username: foundUser.username, role: foundUser.role, email: foundUser.email });
-            return true;
-        }
+        // Hvis det ikke er admin, sjekk vanlig bruker
+        try {
+            const foundUser = await fetchUserByUsername(username);
+            console.log("Found user:", foundUser);
 
-        return false;  // Feil brukernavn/passord
+            if (foundUser && foundUser.password === password) {
+                setUser({ username: foundUser.username, role: foundUser.role, email: foundUser.email });
+                console.log("User login successful:", foundUser);
+                setIsLoading(false);
+                return true;
+            } else {
+                setError("Feil brukernavn eller passord");
+                setIsLoading(false);
+                return false;
+            }
+        } catch (err) {
+            setError("Feil under henting av bruker");
+            setIsLoading(false);
+            return false;
+        }
     };
 
-    const logout = () => setUser(null);  // Logger ut ved å sette user til null
+    const logout = () => {
+        setUser(null);
+    };
+
+    useEffect(() => {
+        console.log("User has been set:", user); // Debugging log
+    }, [user]);
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, isLoading, error }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => useContext(AuthContext); // Bruk av auth context i komponenter
+export const useAuth = () => useContext(AuthContext);
+
