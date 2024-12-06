@@ -2,19 +2,22 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // Base URL for CRUDCRUD API
 const baseQuery = fetchBaseQuery({
-    baseUrl: 'https://crudcrud.com/api/6203786faf284d84aee5f7072199e1c8/', // Sett inn din CRUDCRUD API-nøkkel her
+    baseUrl: 'https://crudcrud.com/api/6203786faf284d84aee5f7072199e1c8/', // Insert your CRUDCRUD API key here
 });
 
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery,
+    tagTypes: ['Users', 'Cvs'], // Define tag types for users and CVs
     endpoints: (builder) => ({
-        // Bruker-endepunkter
+        // User endpoints
         getUsers: builder.query({
-            query: () => 'users', // Hent alle brukere
+            query: () => 'users', // Fetch all users
+            providesTags: ['Users'], // This query is associated with the 'Users' tag
         }),
         getUser: builder.query({
-            query: (id) => `users/${id}`, // Hent én bruker etter ID
+            query: (id) => `users/${id}`, // Fetch a single user by ID
+            providesTags: (result, error, id) => [{ type: 'Users', id }], // Associate specific user ID with the 'Users' tag
         }),
         addUser: builder.mutation({
             query: (user) => ({
@@ -22,6 +25,7 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body: user,
             }),
+            invalidatesTags: ['Users'], // Invalidate the 'Users' tag to refetch user data
         }),
         updateUser: builder.mutation({
             query: ({ id, user }) => ({
@@ -29,20 +33,24 @@ export const apiSlice = createApi({
                 method: 'PUT',
                 body: user,
             }),
+            invalidatesTags: (result, error, { id }) => [{ type: 'Users', id }], // Invalidate the specific user's cache
         }),
         deleteUser: builder.mutation({
             query: (id) => ({
                 url: `users/${id}`,
                 method: 'DELETE',
             }),
+            invalidatesTags: (result, error, id) => [{ type: 'Users', id }], // Invalidate the specific user's cache
         }),
 
-        // CV-endepunkter
+        // CV endpoints
         getCvs: builder.query({
-            query: () => 'cvs', // Hent alle CV-er
+            query: () => 'cvs', // Fetch all CVs
+            providesTags: ['Cvs'], // This query is associated with the 'Cvs' tag
         }),
         getCv: builder.query({
-            query: (id) => `cvs/${id}`, // Hent én CV etter ID
+            query: (id) => `cvs/${id}`, // Fetch a single CV by ID
+            providesTags: (result, error, id) => [{ type: 'Cvs', id }], // Associate specific CV ID with the 'Cvs' tag
         }),
         addCv: builder.mutation({
             query: (cv) => ({
@@ -50,6 +58,7 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body: cv,
             }),
+            invalidatesTags: ['Cvs'], // Invalidate the 'Cvs' tag to refetch CV data
         }),
         updateCv: builder.mutation({
             query: ({ id, cv }) => ({
@@ -57,17 +66,19 @@ export const apiSlice = createApi({
                 method: 'PUT',
                 body: cv,
             }),
+            invalidatesTags: (result, error, { id }) => [{ type: 'Cvs', id }], // Invalidate the specific CV's cache
         }),
         deleteCv: builder.mutation({
             query: (id) => ({
                 url: `cvs/${id}`,
                 method: 'DELETE',
             }),
+            invalidatesTags: (result, error, id) => [{ type: 'Cvs', id }], // Invalidate the specific CV's cache
         }),
     }),
 });
 
-// Export hooks for API-kallene
+// Export hooks for API calls
 export const {
     useGetUsersQuery,
     useGetUserQuery,
