@@ -9,6 +9,7 @@ const AdminPanelPage = () => {
     const { data: users, isLoading, error } = useGetUsersQuery();  // Henter alle brukere
     const [addUser] = useAddUserMutation();  // For å opprette ny bruker
     const [deleteUser] = useDeleteUserMutation();  // For å slette bruker
+    console.log(users);
 
     const [newUser, setNewUser] = useState({
         name: '',
@@ -40,10 +41,14 @@ const AdminPanelPage = () => {
         navigate('/'); // Send tilbake til login-siden etter logout
     };
 
-    const handleDelete = (userId) => {
-        dispatch(deleteUser(userId)); // Fjerner bruker
+    const handleDelete = async (id) => {
+        try {
+            await deleteUser(id).unwrap(); // Unwraps the Promise to handle errors properly
+            console.log(`User with ID ${id} deleted successfully`);
+        } catch (err) {
+            console.error(`Error deleting user with ID ${id}:`, err);
+        }
     };
-
     return (
         <div>
             <h1>Admin Panel</h1>
@@ -105,9 +110,9 @@ const AdminPanelPage = () => {
             {error && <p>{error.message}</p>}
             <ul>
                 {users?.map((user) => (
-                    <li key={user.id}>
+                    <li key={user._id}>
                         {user.name} ({user.email}) - {user.role}
-                        <button onClick={() => handleDelete(user.id)}>Slett bruker</button>
+                        <button onClick={() => handleDelete(user._id)}>Slett bruker</button>
                     </li>
                 ))}
             </ul>
