@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchUsers, createUser, deleteUser, updateUser } from "../Utils/api";
+import { fetchUsers, createUser, deleteUser, updateUser } from "../../Utils/UserApi";
 
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
@@ -50,7 +50,7 @@ const AdminDashboard = () => {
         setEditingUserId(user._id); // Sett ID-en til brukeren som redigeres
         setEditingUser({ ...user }); // Lag en kopi av brukeren
     };
-    
+
     const handleUpdateUser = async () => {
         if (!editingUser.username || !editingUser.email || !editingUser.role) {
             alert("Alle felt må fylles ut");

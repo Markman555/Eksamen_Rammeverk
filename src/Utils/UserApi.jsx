@@ -21,7 +21,7 @@ export const fetchUsers = async () => {
 };
 
 
-// Hent en bruker etter ID
+// Hent en bruker etter ID. Kanskje slett?
 export const fetchUserById = async (id) => {
     const response = await fetch(`${BASE_URL}/users/${id}`);
     if (!response.ok) {
@@ -108,7 +108,7 @@ export const deleteUser = async (id) => {
         throw new Error("Kunne ikke slette bruker");
     }
 };
-
+//Kanskje slett?
 export const fetchUserByUsername = async (username) => {
     const users = await fetchUsers();
     return users.find((u) => u.username === username);
