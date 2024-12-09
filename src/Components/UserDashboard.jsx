@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CVForm from "./CVForm";
+import CVView from "./CvView";
 import { fetchCV, createCV, updateCVById, deleteCVById } from "../Utils/CvsApi";
 import { useAuth } from "../Context/AuthContext";
 
@@ -9,6 +10,7 @@ const UserDashboard = () => {
     const [selectedCV, setSelectedCV] = useState(null);
     const [isCreating, setIsCreating] = useState(false); // Skiller mellom "create" og "edit"
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [viewingCV, setViewingCV] = useState(null);
 
     // Hent CV-er når komponenten laster inn
     useEffect(() => {
@@ -27,11 +29,10 @@ const UserDashboard = () => {
         }
     }, [user]);
 
-    // Håndter opprettelse av ny CV
     const handleCreateNewCV = () => {
-        setSelectedCV(null); // Nullstiller tidligere valgt CV
-        setIsCreating(true); // Marker at vi lager en ny CV
-        setIsFormVisible(true); // Viser skjemaet
+        setSelectedCV(null); 
+        setIsCreating(true); 
+        setIsFormVisible(true); 
     };
 
     const handleSaveCV = async (cvData) => {
@@ -49,7 +50,6 @@ const UserDashboard = () => {
                 const isUpdated = await updateCVById(selectedCV._id, sanitizedCVData);
     
                 if (isUpdated) {
-                    // Hvis oppdateringen var vellykket, oppdater listen med CV-er
                     setCvs(prev => prev.map(cv => (cv._id === selectedCV._id ? { ...cv, ...sanitizedCVData } : cv)));
                 } else {
                     console.error("Failed to update CV.");
@@ -61,18 +61,15 @@ const UserDashboard = () => {
         }
     };
 
-
-    // Håndter sletting av CV
     const handleDeleteCV = async (cvId) => {
         try {
             await deleteCVById(cvId);
-            setCvs(prev => prev.filter(cv => cv._id !== cvId)); // Fjern fra listen
+            setCvs(prev => prev.filter(cv => cv._id !== cvId)); 
         } catch (error) {
             console.error("Error deleting CV:", error);
         }
     };
 
-    // Håndter redigering av CV
     const handleEditCV = (cv) => {
         setSelectedCV(cv); // Sett valgt CV
         setIsCreating(false); // Marker at vi redigerer
@@ -84,23 +81,37 @@ const UserDashboard = () => {
             <h1>Velkommen, {user?.username || "Bruker"}!</h1>
             <button onClick={handleCreateNewCV}>Create CV</button>
 
-            {isFormVisible && (
-                <CVForm
-                    initialData={selectedCV} // Send valgt CV (eller null)
-                    onSave={handleSaveCV}
-                    onCancel={() => setIsFormVisible(false)}
+            {viewingCV ? (
+                <CVView
+                    cv={viewingCV}
+                    onClose={() => setViewingCV(null)}
                 />
-            )}
+            ) : (
+                <>
+                    {isFormVisible && (
+                        <CVForm
+                            initialData={selectedCV} // Send valgt CV (eller null)
+                            onSave={handleSaveCV}
+                            onCancel={() => setIsFormVisible(false)}
+                        />
+                    )}
 
-            <ul>
-                {cvs.map(cv => (
-                    <li key={cv._id}>
-                        <h3>{cv.personalInfo?.name || "Ukjent navn"}</h3>
-                        <button onClick={() => handleEditCV(cv)}>Edit</button>
-                        <button onClick={() => handleDeleteCV(cv._id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+                    <ul>
+                        {cvs.map(cv => (
+                            <li key={cv._id}>
+                                <h3
+                                    onClick={() => setViewingCV(cv)}
+                                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                                >
+                                    {cv.personalInfo?.name || "Ukjent navn"}
+                                </h3>
+                                <button onClick={() => handleEditCV(cv)}>Edit</button>
+                                <button onClick={() => handleDeleteCV(cv._id)}>Delete</button>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            )}
         </div>
     );
 };
