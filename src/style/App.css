@@ -1,0 +1,21 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  
+}
+
+button {
+  margin-left: 10px;
+}
+
+
+h3 {
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue;
+}
+
+h3:hover {
+  color: darkblue;
+}

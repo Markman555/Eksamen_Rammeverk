@@ -5,6 +5,7 @@ import LoginForm from "./Components/LoginForm";
 import AdminDashboard from "./Components/admin/AdminDashboard";
 import UserDashboard from "./Components/UserDashboard";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import './style/App.css'
 
 const App = () => (
   <AuthProvider>

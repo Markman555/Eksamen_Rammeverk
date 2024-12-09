@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { fetchCV, deleteCVById, updateCVById } from "../../Utils/CvsApi";
+import { fetchCV, deleteCVById, updateCVById, createCV } from "../../Utils/CvsApi";
 import CVView from "../CvView";
-import CVForm from "../CVForm"; 
+import CVForm from "../CVForm";
 
+// CVManagement må ha med hvilken bruker det skal knyttes til
+// Lag custom hooks
 const CVManagement = () => {
     const [cvs, setCvs] = useState([]);
     const [viewingCV, setViewingCV] = useState(null);
     const [editingCV, setEditingCV] = useState(null);
+    const [isCreating, setIsCreating] = useState(false);
 
     useEffect(() => {
         const loadCVs = async () => {
@@ -31,22 +34,48 @@ const CVManagement = () => {
 
     const handleEditCV = (cv) => {
         setEditingCV(cv);
+        setIsCreating(false); 
     };
 
-    const handleUpdateCV = async (updatedData) => {
+    const handleCreateCV = () => {
+        setEditingCV(null);
+        setIsCreating(true);
+    };
+
+    const handleSaveCV = async (cvData) => {
         try {
-            await updateCVById(editingCV._id, updatedData); 
-            setCvs((prev) =>
-                prev.map((cv) => (cv._id === editingCV._id ? { ...cv, ...updatedData } : cv))
-            );
-            setEditingCV(null); 
+            if (isCreating) {
+                console.log("Creating CV:", cvData);
+                const newCV = await createCV(cvData);
+                setCvs((prev) => [...prev, newCV]);
+            } else if (editingCV) {
+                console.log("Updating CV:", editingCV._id, cvData);
+
+                const sanitizedCVData = { ...cvData };
+                delete sanitizedCVData._id; 
+
+                const isUpdated = await updateCVById(editingCV._id, sanitizedCVData);
+
+                if (isUpdated) {
+                    setCvs((prev) =>
+                        prev.map((cv) =>
+                            cv._id === editingCV._id ? { ...cv, ...sanitizedCVData } : cv
+                        )
+                    );
+                } else {
+                    console.error("Failed to update CV.");
+                }
+            }
+            setEditingCV(null);
+            setIsCreating(false);
         } catch (error) {
-            console.error(error.message);
+            console.error("Error saving CV:", error);
         }
     };
 
     const handleCancelEdit = () => {
-        setEditingCV(null); 
+        setEditingCV(null);
+        setIsCreating(false);
     };
 
     return (
@@ -54,22 +83,27 @@ const CVManagement = () => {
             <h2>Alle CVer</h2>
             {viewingCV ? (
                 <CVView cv={viewingCV} onClose={() => setViewingCV(null)} />
-            ) : editingCV ? (
+            ) : editingCV || isCreating ? (
                 <CVForm
                     initialData={editingCV} 
-                    onSave={handleUpdateCV} 
+                    onSave={handleSaveCV} 
                     onCancel={handleCancelEdit} 
                 />
             ) : (
-                <ul>
-                    {cvs.map((cv) => (
-                        <li key={cv._id}>
-                            <h3 onClick={() => setViewingCV(cv)}>{cv.personalInfo?.name || "Ukjent navn"}</h3>
-                            <button onClick={() => handleEditCV(cv)}>Rediger</button>
-                            <button onClick={() => handleDeleteCV(cv._id)}>Slett</button>
-                        </li>
-                    ))}
-                </ul>
+                <>
+                    <button onClick={handleCreateCV}>Opprett Ny CV</button>
+                    <ul>
+                        {cvs.map((cv) => (
+                            <li key={cv._id}>
+                                <h3 onClick={() => setViewingCV(cv)}>
+                                    {cv.personalInfo?.name || "Ukjent navn"}
+                                </h3>
+                                <button onClick={() => handleEditCV(cv)}>Rediger</button>
+                                <button onClick={() => handleDeleteCV(cv._id)}>Slett</button>
+                            </li>
+                        ))}
+                    </ul>
+                </>
             )}
         </div>
     );

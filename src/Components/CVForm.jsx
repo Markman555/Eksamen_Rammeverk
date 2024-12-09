@@ -7,13 +7,13 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
             email: "",
             phone: "",
         },
-        skills: [],
+        skills: [], //Gjør om til objekt?
         education: [],
         experience: [],
         references: [],
     });
 
-    // Når initialData endrer seg, oppdater formData
+
     useEffect(() => {
         if (initialData) {
             setFormData(initialData);

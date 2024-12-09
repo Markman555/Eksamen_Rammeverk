@@ -76,7 +76,7 @@ const UserManagement = () => {
 
     return (
         <div>
-            <h3>Opprett ny bruker</h3>
+            <h2>Opprett ny bruker</h2>
             <input
                 type="text"
                 placeholder="Brukernavn"
