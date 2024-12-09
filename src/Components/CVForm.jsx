@@ -7,10 +7,10 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
             email: "",
             phone: "",
         },
-        skills: "",
-        education: "",
-        experience: "",
-        references: "",
+        skills: [],
+        education: [],
+        experience: [],
+        references: [],
     });
 
     // Når initialData endrer seg, oppdater formData
@@ -38,6 +38,28 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
         }
     };
 
+    const handleArrayChange = (e, field, index) => {
+        const newValue = e.target.value;
+        setFormData((prev) => ({
+            ...prev,
+            [field]: prev[field].map((item, i) => (i === index ? newValue : item)),
+        }));
+    };
+    
+    const handleAddItem = (field) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: [...prev[field], ""],
+        }));
+    };
+    
+    const handleRemoveItem = (field, index) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: prev[field].filter((_, i) => i !== index),
+        }));
+    };
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         onSave(formData); // Send data tilbake til UserDashboard
@@ -74,40 +96,76 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
                 />
             </label>
             <label>
-                Skills:
-                <input
-                    type="text"
-                    name="skills"
-                    value={formData.skills}
-                    onChange={handleChange}
-                />
-            </label>
+            Skills:
+           {formData.skills.map((skill, index) => (
+               <div key={index}>
+               <input
+                type="text"
+                value={skill}
+                onChange={(e) => handleArrayChange(e, "skills", index)}
+            />
+            <button type="button" onClick={() => handleRemoveItem("skills", index)}>
+                Remove
+            </button>
+           </div>
+            ))}
+          <button type="button" onClick={() => handleAddItem("skills")}>
+        Add Skill
+       </button>
+      </label>
             <label>
                 Education:
-                <input
-                    type="text"
-                    name="education"
-                    value={formData.education}
-                    onChange={handleChange}
-                />
+                {formData.education.map((education, index) => (
+                    <div key={index}>
+                        <input 
+                         type="text"
+                         value={education}
+                         onChange={(e) => handleArrayChange(e, "education", index)}
+                         />
+                         <button type="button" onClick={() => handleRemoveItem("education", index)}>
+                            Remove
+                         </button>
+                    </div>
+                ))}
+                   <button type="button" onClick={() => handleAddItem("education")}>
+                    Add Education
+                   </button>
             </label>
             <label>
                 Experience:
-                <input
-                    type="text"
-                    name="experience"
-                    value={formData.experience}
-                    onChange={handleChange}
-                />
+                {formData.experience.map((experience, index) => (
+                    <div key={index}>
+                        <input 
+                         type="text"
+                         value={experience}
+                         onChange={(e) => handleArrayChange(e, "experience", index)}
+                         />
+                         <button type="button" onClick={() => handleRemoveItem("experience", index)}>
+                            Remove
+                         </button>
+                    </div>
+                ))}
+                   <button type="button" onClick={() => handleAddItem("experience")}>
+                    Add experience
+                   </button>
             </label>
             <label>
                 References:
-                <input
-                    type="text"
-                    name="references"
-                    value={formData.references}
-                    onChange={handleChange}
-                />
+                {formData.references.map((references, index) => (
+                    <div key={index}>
+                        <input 
+                         type="text"
+                         value={references}
+                         onChange={(e) => handleArrayChange(e, "references", index)}
+                         />
+                         <button type="button" onClick={() => handleRemoveItem("references", index)}>
+                            Remove
+                         </button>
+                    </div>
+                ))}
+                   <button type="button" onClick={() => handleAddItem("references")}>
+                    Add references
+                   </button>
             </label>
             <button type="submit">Save</button>
             <button type="button" onClick={onCancel}>
