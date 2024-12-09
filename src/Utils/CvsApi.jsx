@@ -16,14 +16,12 @@ export const fetchCVById = async () => {
     }
 };
 
-
-// Opprett en ny CV
-export const createCV = async (cvData, userId) => {
+export const createCV = async (cvData, userName) => {
     try {
         const response = await fetch(`${BASE_URL}/cvs`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...cvData, userId }), // Legg til userId
+            body: JSON.stringify({ ...cvData, userName }), // Legg til userId
         });
         if (!response.ok) {
             throw new Error(`Failed to create CV: ${response.status}`);
