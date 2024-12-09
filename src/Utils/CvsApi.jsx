@@ -1,5 +1,6 @@
 const BASE_URL = "https://crudcrud.com/api/6203786faf284d84aee5f7072199e1c8";
-export const fetchCV = async (userId) => {
+
+export const fetchCVById = async () => {
     try {
         const response = await fetch(`${BASE_URL}/cvs`);
         if (!response.ok) {
@@ -7,8 +8,8 @@ export const fetchCV = async (userId) => {
         }
         const allCVs = await response.json();
         // Filtrer CV-er basert på brukerens ID
-        const userCVs = allCVs.filter((cv) => cv.userId === userId);
-        return userCVs;
+       
+        return allCVs;
     } catch (error) {
         console.error("Error fetching CVs:", error);
         throw error;
