@@ -1,14 +1,12 @@
 const BASE_URL = "https://crudcrud.com/api/6203786faf284d84aee5f7072199e1c8";
 
-export const fetchCVById = async () => {
+export const fetchCV = async () => {
     try {
         const response = await fetch(`${BASE_URL}/cvs`);
         if (!response.ok) {
             throw new Error(`Failed to fetch CVs: ${response.status}`);
         }
         const allCVs = await response.json();
-        // Filtrer CV-er basert på brukerens ID
-       
         return allCVs;
     } catch (error) {
         console.error("Error fetching CVs:", error);
@@ -21,7 +19,7 @@ export const createCV = async (cvData, userName) => {
         const response = await fetch(`${BASE_URL}/cvs`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...cvData, userName }), // Legg til userId
+            body: JSON.stringify({ ...cvData, userName }), 
         });
         if (!response.ok) {
             throw new Error(`Failed to create CV: ${response.status}`);
@@ -34,7 +32,6 @@ export const createCV = async (cvData, userName) => {
     }
 };
 
-// Oppdater eksisterende CV basert på CV-ID
 export const updateCVById = async (cvId, cvData) => {
     try {
         const response = await fetch(`https://crudcrud.com/api/6203786faf284d84aee5f7072199e1c8/cvs/${cvId}`, {
@@ -58,8 +55,6 @@ export const updateCVById = async (cvId, cvData) => {
     }
 };
 
-
-// Slett en CV basert på CV-ID
 export const deleteCVById = async (cvId) => {
     try {
         const response = await fetch(`${BASE_URL}/cvs/${cvId}`, {

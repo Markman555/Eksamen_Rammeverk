@@ -62,7 +62,7 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSave(formData); // Send data tilbake til UserDashboard
+        onSave(formData); 
     };
 
     return (
