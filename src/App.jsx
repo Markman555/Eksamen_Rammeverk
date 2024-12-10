@@ -5,7 +5,7 @@ import LoginForm from "./Components/LoginForm";
 import AdminDashboard from "./Components/admin/AdminDashboard";
 import UserDashboard from "./Components/UserDashboard";
 import ProtectedRoute from "./Components/ProtectedRoute";
-import './style/App.css'
+import "./style/App.css";
 
 const App = () => (
   <AuthProvider>
@@ -13,7 +13,7 @@ const App = () => (
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route
-          path="/admin"
+          path="/admin-dashboard"
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard />
@@ -21,17 +21,13 @@ const App = () => (
           }
         />
         <Route
-          path="/user"
+          path="/user-dashboard"
           element={
             <ProtectedRoute role="user">
               <UserDashboard />
             </ProtectedRoute>
           }
         />
-        {/* Add the route for admin-dashboard */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        {/* Optionally, add the route for user-dashboard */}
-        <Route path="/user-dashboard" element={<UserDashboard />} />
       </Routes>
     </Router>
   </AuthProvider>
