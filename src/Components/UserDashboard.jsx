@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import useCVs from "../Hooks/UseCvs";
 import CVForm from "./CVForm";
+import CVView from "./CvView";
 
 const UserDashboard = ({ user }) => {
     const { cvs, addCV, updateCV, deleteCV, loading, error } = useCVs(false, user);
     const [selectedCV, setSelectedCV] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [viewingCV, setViewingCV] = useState(null);
 
     const handleCreateNewCV = () => {
         setSelectedCV(null);
@@ -31,32 +33,44 @@ const UserDashboard = ({ user }) => {
             <h2>Mine CVer</h2>
             {loading && <p>Laster...</p>}
             {error && <p>Error: {error}</p>}
-            <button onClick={handleCreateNewCV}>Opprett ny CV</button>
-            <ul>
-                {cvs.map((cv) => (
-                    <li key={cv._id}>
-                        <h3>{cv.personalInfo?.name || "Ukjent navn"}</h3>
-                        <button onClick={() => handleEditCV(cv)}>Rediger</button>
-                        <button onClick={() => deleteCV(cv._id)}>Slett</button>
-                    </li>
-                ))}
-            </ul>
-            {isFormVisible && (
-                <CVForm
-                    initialData={isCreating ? null : selectedCV}
-                    onSave={(cvData) => {
-                        if (isCreating) {
-                            addCV(cvData);
-                        } else {
-                            updateCV(selectedCV._id, cvData);
-                        }
-                        setIsFormVisible(false);
-                    }}
-                    onCancel={handleCancelEdit}
-                />
+            {viewingCV ? (
+                <CVView cv={viewingCV} onClose={() => setViewingCV(null)} />
+            ) : (
+                <>
+                    <button onClick={handleCreateNewCV}>Opprett ny CV</button>
+                    <ul>
+                        {cvs.map((cv) => (
+                            <li key={cv._id}>
+                                <h3
+                                    onClick={() => setViewingCV(cv)}
+                                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                                >
+                                    {cv.personalInfo?.name || "Ukjent navn"}
+                                </h3>
+                                <button onClick={() => handleEditCV(cv)}>Rediger</button>
+                                <button onClick={() => deleteCV(cv._id)}>Slett</button>
+                            </li>
+                        ))}
+                    </ul>
+                    {isFormVisible && (
+                        <CVForm
+                            initialData={isCreating ? null : selectedCV}
+                            onSave={(cvData) => {
+                                if (isCreating) {
+                                    addCV(cvData);
+                                } else {
+                                    updateCV(selectedCV._id, cvData);
+                                }
+                                setIsFormVisible(false);
+                            }}
+                            onCancel={handleCancelEdit}
+                        />
+                    )}
+                </>
             )}
         </div>
     );
+    
 };
 
 export default UserDashboard;

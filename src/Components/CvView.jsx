@@ -1,6 +1,6 @@
 import React from "react";
 
-const CvView = ({ cv, onClose }) => {
+const CVView = ({ cv, onClose }) => {
     if (!cv) return null;
 
     return (
@@ -20,21 +20,27 @@ const CvView = ({ cv, onClose }) => {
             <h3>Education</h3>
             <ul>
                 {cv.education?.map((edu, index) => (
-                    <li key={index}>{edu}</li>
+                    <li key={index}>
+                        {edu.institution}, {edu.degree} ({edu.year})
+                    </li>
                 ))}
             </ul>
 
             <h3>Experience</h3>
             <ul>
                 {cv.experience?.map((exp, index) => (
-                    <li key={index}>{exp}</li>
+                    <li key={index}>
+                        {exp.title} at {exp.company} ({exp.years})
+                    </li>
                 ))}
             </ul>
 
             <h3>References</h3>
             <ul>
                 {cv.references?.map((ref, index) => (
-                    <li key={index}>{ref}</li>
+                    <li key={index}>
+                        {ref.name} - {ref.contactInfo}
+                    </li>
                 ))}
             </ul>
 
@@ -43,4 +49,4 @@ const CvView = ({ cv, onClose }) => {
     );
 };
 
-export default CvView;
+export default CVView;
