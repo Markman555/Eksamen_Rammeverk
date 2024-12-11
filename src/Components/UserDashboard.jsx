@@ -4,10 +4,9 @@ import CVForm from "./CV/CVForm";
 import CVView from "./CV/CvView";
 import CVCustomizer from "./CV/CvCustomizer";
 import exportToPDF from "../Utils/ExportToPdf";
-import { useAuth } from "../Context/AuthContext";
+import { user, logout } from "../Context/AuthContext";
 
 const UserDashboard = () => {
-    const { user, logout } = useAuth();
     const { cvs, addCV, updateCV, deleteCV, loading, error } = useCVs(false, user);
     const [selectedCV, setSelectedCV] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
