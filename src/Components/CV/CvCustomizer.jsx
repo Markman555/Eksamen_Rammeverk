@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import createPDFWithTemplate from "../../Utils/ExportToPdf";
 
-const CVCustomizer = ({ cv, onExport, onClose }) => {
+const CVCustomizer = ({ cv, onClose }) => {
     const [selectedSkills, setSelectedSkills] = useState(new Set(cv.skills));
     const [selectedExperience, setSelectedExperience] = useState(new Set(cv.experience));
     const [selectedEducation, setSelectedEducation] = useState(new Set(cv.education));
+    const [selectedTemplate, setSelectedTemplate] = useState("default");
 
     const toggleSelection = (set, item) => {
         set((prev) => {
@@ -17,9 +19,34 @@ const CVCustomizer = ({ cv, onExport, onClose }) => {
         });
     };
 
+    const handleExport = () => {
+        // Samle alt data, inkludert personlig informasjon
+        const customizedCV = {
+            personalInfo: cv.personalInfo,
+            skills: Array.from(selectedSkills),
+            experience: Array.from(selectedExperience),
+            education: Array.from(selectedEducation),
+        };
+
+        // Bruk template og eksporter til PDF
+        createPDFWithTemplate(customizedCV, selectedTemplate);
+    };
+
     return (
         <div>
             <h2>Tilpass CV</h2>
+            <h3>Personlig Informasjon</h3>
+            <p><strong>Navn:</strong> {cv.personalInfo.name}</p>
+            <p><strong>Adresse:</strong> {cv.personalInfo.address}</p>
+            <p><strong>Telefon:</strong> {cv.personalInfo.phone}</p>
+            <p><strong>E-post:</strong> {cv.personalInfo.email}</p>
+
+            <h3>Velg mal</h3>
+            <select onChange={(e) => setSelectedTemplate(e.target.value)} value={selectedTemplate}>
+                <option value="default">Standard</option>
+                <option value="modern">Moderne</option>
+            </select>
+
             <h3>Ferdigheter</h3>
             <ul>
                 {cv.skills.map((skill, index) => (
@@ -68,14 +95,8 @@ const CVCustomizer = ({ cv, onExport, onClose }) => {
                 ))}
             </ul>
 
-            <button onClick={() => onExport({
-                skills: Array.from(selectedSkills),
-                experience: Array.from(selectedExperience),
-                education: Array.from(selectedEducation),
-            })}>
-                Eksporter til PDF
-            </button>
-            <button onClick={onClose} className="close-btn">Close</button>
+            <button onClick={handleExport}>Eksporter til PDF</button>
+            <button onClick={onClose} className="close-btn">Lukk</button>
         </div>
     );
 };

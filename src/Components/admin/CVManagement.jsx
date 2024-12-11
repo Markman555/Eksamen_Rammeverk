@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import useCVs from "../../Hooks/UseCvs";
 import CVForm from "../CV/CVForm";
 import CVView from '../CV/CvView';
-import exportToPDF from "../../Utils/ExportToPdf";
 import CVCustomizer from "../CV/CvCustomizer";
 
 const CVManagement = () => {
@@ -12,10 +11,6 @@ const CVManagement = () => {
     const [hoveredCV, setHoveredCV] = useState(null); 
     const [customizingCV, setCustomizingCV] = useState(null); 
     const [viewingDetails, setViewingDetails] = useState(null); 
-
-    const handleExport = (customizedCV) => {
-        exportToPDF(customizedCV);
-    };
 
     const handleEditCV = (cv) => {
         setEditingCV(cv);
@@ -116,7 +111,6 @@ const CVManagement = () => {
                                 {customizingCV?._id === cv._id && (
                                     <CVCustomizer 
                                         cv={cv} 
-                                        onExport={handleExport} 
                                         onClose={() => setCustomizingCV(null)} 
                                     />
                                 )}
