@@ -30,9 +30,19 @@ const CVManagement = () => {
         setIsCreating(false);
     };
 
+    const handleSave = (cvData) => {
+        if (isCreating) {
+            addCV(cvData); 
+        } else if (editingCV?._id) {
+            updateCV(editingCV._id, cvData); 
+        }
+        setEditingCV(null);
+        setIsCreating(false); 
+    };
+
     return (
         <div>
-            <h2>Alle CVer</h2>
+            <h2>Liste over CV til brukere</h2>
             {loading && <p>Laster...</p>}
             {error && <p>Error: {error}</p>}
             {viewingCV ? (
@@ -60,15 +70,7 @@ const CVManagement = () => {
                     {(isCreating || editingCV) && (
                         <CVForm
                             initialData={isCreating ? null : editingCV}
-                            onSave={(cvData) => {
-                                if (isCreating) {
-                                    addCV(cvData);
-                                } else {
-                                    updateCV(editingCV._id, cvData);
-                                }
-                                setEditingCV(null);
-                                setIsCreating(false);
-                            }}
+                            onSave={handleSave}
                             onCancel={handleCancelEdit}
                         />
                     )}

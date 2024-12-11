@@ -55,11 +55,14 @@ const UserManagement = () => {
             alert("Alle felt må fylles ut");
             return;
         }
-
+    
         try {
-            await updateUser(editingUserId, editingUser);
+            const sanitizedUser = { ...editingUser };
+            delete sanitizedUser._id; 
+            await updateUser(editingUserId, sanitizedUser); 
+    
             const updatedUsers = users.map((user) =>
-                user._id === editingUserId ? { ...user, ...editingUser } : user
+                user._id === editingUserId ? { ...user, ...sanitizedUser } : user
             );
             setUsers(updatedUsers);
             setEditingUserId(null);
@@ -68,6 +71,7 @@ const UserManagement = () => {
             console.error(error.message);
         }
     };
+    
 
     const handleCancelEdit = () => {
         setEditingUserId(null);
@@ -104,7 +108,7 @@ const UserManagement = () => {
             </select>
             <button onClick={handleCreateUser}>Opprett</button>
 
-            <h3>Eksisterende brukere</h3>
+            <h2>Eksisterende brukere</h2>
             <ul>
                 {users.map((user) => (
                     <li key={user._id}>

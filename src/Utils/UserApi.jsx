@@ -32,7 +32,6 @@ export const fetchUserById = async (id) => {
 
 
 export const createUser = async (user) => {
-    console.log("Sender data til serveren:", user); // Logg dataene før de sendes
 
     const response = await fetch(`${BASE_URL}/users`, {
         method: "POST",
@@ -64,30 +63,25 @@ export const updateUser = async (id, updatedData) => {
 
     console.log("Respons fra serveren:", response);
 
-    // Håndter feil ved oppdatering
     if (!response.ok) {
         const errorDetails = await response.text();
         console.error("Feil ved oppdatering:", errorDetails);
         throw new Error("Kunne ikke oppdatere bruker");
     }
 
-    // Håndter spesifikke 204 No Content-tilfeller
     if (response.status === 204) {
         console.log("Serveren returnerte ingen innhold (204)");
         return {};  // Returner et tomt objekt
     }
 
-    // Hvis responsen ikke er tom, prøv å parse JSON
     const responseText = await response.text();
     console.log("Responsinnhold:", responseText);
 
-    // Sjekk om det finnes noe innhold i responsen
     if (responseText.trim() === "") {
         console.log("Serveren returnerte ingen data.");
         return {};  // Returner et tomt objekt hvis responsen er tom
     }
 
-    // Prøv å parse JSON
     try {
         const responseData = JSON.parse(responseText);
         console.log("Responsdata etter oppdatering:", responseData);

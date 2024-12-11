@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import UserManagement from "./UserManagement";
 import CVManagement from "./CVManagement";
-import { logout } from "../../Context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 const AdminDashboard = () => {
     const [view, setView] = useState("users"); 
+    const { logout } = useAuth();
 
     return (
         <div>
