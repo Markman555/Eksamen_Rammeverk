@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import UserManagement from "./UserManagement";
 import CVManagement from "./CVManagement";
+import { useAuth } from "../../Context/AuthContext";
 
 const AdminDashboard = () => {
     const [view, setView] = useState("users"); 
+    const { logout } = useAuth();
 
     return (
         <div>
+            <div className="dashboard-header">
             <h1>Admin Dashboard</h1>
+            <button onClick={logout}>Logg ut</button>
+            </div>
             <div>
                 <button onClick={() => setView("users")}>Administrer brukere</button>
                 <button onClick={() => setView("cvs")}>Administrer CVer</button>

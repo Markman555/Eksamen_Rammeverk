@@ -4,8 +4,10 @@ import CVForm from "./CV/CVForm";
 import CVView from "./CV/CvView";
 import CVCustomizer from "./CV/CvCustomizer";
 import exportToPDF from "../Utils/ExportToPdf";
+import { useAuth } from "../Context/AuthContext";
 
-const UserDashboard = ({ user }) => {
+const UserDashboard = () => {
+    const { user, logout } = useAuth();
     const { cvs, addCV, updateCV, deleteCV, loading, error } = useCVs(false, user);
     const [selectedCV, setSelectedCV] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
@@ -36,7 +38,10 @@ const UserDashboard = ({ user }) => {
 
     return (
         <div>
+          <div className="dashboard-header">
             <h2>Mine CVer</h2>
+             <button onClick={logout}>Logg ut</button>
+           </div>
             {loading && <p>Laster...</p>}
             {error && <p>Error: {error}</p>}
             {viewingCV ? (

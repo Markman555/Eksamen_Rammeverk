@@ -19,3 +19,11 @@ h3 {
 h3:hover {
   color: darkblue;
 }
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
