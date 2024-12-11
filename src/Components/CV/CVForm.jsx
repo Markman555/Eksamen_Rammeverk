@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
 
+const existingInstitutions = [
+    "Gokstad Akademiet",
+    "University of Oslo",
+    "OsloMet",
+    "Norges teknisk-naturvitenskapelige universitet",
+    "Universitetet i Bergen",
+];
+
 const CVForm = ({ initialData, onSave, onCancel }) => {
     const [formData, setFormData] = useState({
         personalInfo: {
@@ -12,6 +20,9 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
         experience: [],
         references: [],
     });
+
+    const [institutionSuggestions, setInstitutionSuggestions] = useState([]);
+    const [selectedInstitution, setSelectedInstitution] = useState("");
 
     useEffect(() => {
         if (initialData) {
@@ -79,10 +90,52 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
         onSave(formData);
     };
 
+    const handleInstitutionChange = (e, index) => {
+        const value = e.target.value;
+        setSelectedInstitution(value);
+        if (value) {
+            const filteredSuggestions = existingInstitutions.filter((institution) =>
+                institution.toLowerCase().includes(value.toLowerCase())
+            );
+            setInstitutionSuggestions(filteredSuggestions);
+        } else {
+            setInstitutionSuggestions([]);
+        }
+
+        setFormData((prev) => {
+            const updatedEducation = [...prev.education];
+            updatedEducation[index] = {
+                ...updatedEducation[index],
+                institution: value,
+            };
+            return {
+                ...prev,
+                education: updatedEducation,
+            };
+        });
+    };
+
+    const handleInstitutionSelect = (institution, index) => {
+        setSelectedInstitution(institution);
+        setInstitutionSuggestions([]); 
+  
+        setFormData((prev) => {
+            const updatedEducation = [...prev.education];
+            updatedEducation[index] = {
+                ...updatedEducation[index],
+                institution: institution,
+            };
+            return {
+                ...prev,
+                education: updatedEducation,
+            };
+        });
+    };
+
     return (
         <form onSubmit={handleSubmit}>
             <h2>{initialData ? "Edit CV" : "Create CV"}</h2>
-            <h3>Personal Info</h3>
+            <h4>Personal Info</h4>
             <label>
                 Name:
                 <input
@@ -111,7 +164,7 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
                 />
             </label>
 
-            <h3>Skills</h3>
+            <h4>Skills</h4>
             {formData.skills.map((skill, index) => (
                 <div key={index}>
                     <input
@@ -128,17 +181,28 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
                 Add Skill
             </button>
 
-            <h3>Education</h3>
+            <h4>Education</h4>
             {formData.education.map((education, index) => (
                 <div key={index}>
                     <input
                         type="text"
                         placeholder="Institution"
-                        value={education.institution || ""}
-                        onChange={(e) =>
-                            handleArrayChange("education", index, "institution", e.target.value)
-                        }
+                        value={education.institution || selectedInstitution}
+                        onChange={(e) => handleInstitutionChange(e, index)}
                     />
+                    {institutionSuggestions.length > 0 && (
+                        <div className="institution-suggestions">
+                            {institutionSuggestions.map((institution, idx) => (
+                                <div
+                                    key={idx}
+                                    className="suggestion-item"
+                                    onClick={() => handleInstitutionSelect(institution, index)}
+                                >
+                                    {institution}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <input
                         type="text"
                         placeholder="Degree"
@@ -169,7 +233,7 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
                 Add Education
             </button>
 
-            <h3>Experience</h3>
+            <h4>Experience</h4>
             {formData.experience.map((experience, index) => (
                 <div key={index}>
                     <input
@@ -210,7 +274,7 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
                 Add Experience
             </button>
 
-            <h3>References</h3>
+            <h4>References</h4>
             {formData.references.map((reference, index) => (
                 <div key={index}>
                     <input
