@@ -4,7 +4,7 @@ import { fetchUserByUsername } from "../Utils/UserApi";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null); // user starter som null
+    const [user, setUser] = useState(null); 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -16,16 +16,13 @@ export const AuthProvider = ({ children }) => {
 
         console.log(`Logging in with username: ${username}, password: ${password}`);
 
-        // Sjekk om admin logger inn
         if (username === admin.username && password === admin.password) {
             console.log("Admin login successful");
             setUser({ username: admin.username, role: admin.role });
             setIsLoading(false);
             return true;
         }
-
-        // Hvis det ikke er admin, sjekk vanlig bruker
-        try {
+             try {
             const foundUser = await fetchUserByUsername(username);
             console.log("Found user:", foundUser);
 
@@ -51,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        console.log("User has been set:", user); // Debugging log
+        console.log("User has been set:", user); 
     }, [user]);
 
     return (

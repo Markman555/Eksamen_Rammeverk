@@ -1,13 +1,19 @@
 import React, { useState } from "react";
 import useCVs from "../../Hooks/UseCvs";
-import CVForm from "../CVForm";
-import CVView from '../CvView';
+import CVForm from "../CV/CVForm";
+import CVView from '../CV/CvView';
+import exportToPDF from "../../Utils/ExportToPdf";
+import CVCustomizer from "../CV/CvCustomizer";
 
 const CVManagement = () => {
     const { cvs, addCV, updateCV, deleteCV, loading, error } = useCVs(true, null);
     const [editingCV, setEditingCV] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
     const [viewingCV, setViewingCV] = useState(null);
+
+    const handleExport = (customizedCV) => {
+        exportToPDF(customizedCV);
+    };
 
     const handleEditCV = (cv) => {
         setEditingCV(cv);
@@ -30,7 +36,10 @@ const CVManagement = () => {
             {loading && <p>Laster...</p>}
             {error && <p>Error: {error}</p>}
             {viewingCV ? (
-                <CVView cv={viewingCV} onClose={() => setViewingCV(null)} />
+                <>
+                    <CVView cv={viewingCV} onClose={() => setViewingCV(null)} />
+                    <CVCustomizer cv={viewingCV} onExport={handleExport} />
+                </>
             ) : (
                 <>
                     <button onClick={handleCreateCV}>Opprett ny CV</button>
@@ -63,11 +72,13 @@ const CVManagement = () => {
                             onCancel={handleCancelEdit}
                         />
                     )}
+                    {editingCV && (
+                        <CVCustomizer cv={editingCV} onExport={handleExport} />
+                    )}
                 </>
             )}
         </div>
     );
 };
-    
 
 export default CVManagement;

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import useCVs from "../Hooks/UseCvs";
-import CVForm from "./CVForm";
-import CVView from "./CvView";
+import CVForm from "./CV/CVForm";
+import CVView from "./CV/CvView";
+import CVCustomizer from "./CV/CvCustomizer";
+import exportToPDF from "../Utils/ExportToPdf";
 
 const UserDashboard = ({ user }) => {
     const { cvs, addCV, updateCV, deleteCV, loading, error } = useCVs(false, user);
@@ -28,13 +30,20 @@ const UserDashboard = ({ user }) => {
         setIsFormVisible(false);
     };
 
+    const handleExport = (cv) => {
+        exportToPDF(cv);
+    };
+
     return (
         <div>
             <h2>Mine CVer</h2>
             {loading && <p>Laster...</p>}
             {error && <p>Error: {error}</p>}
             {viewingCV ? (
-                <CVView cv={viewingCV} onClose={() => setViewingCV(null)} />
+                <>
+                    <CVView cv={viewingCV} onClose={() => setViewingCV(null)} />
+                    <CVCustomizer cv={viewingCV} onExport={handleExport} />
+                </>
             ) : (
                 <>
                     <button onClick={handleCreateNewCV}>Opprett ny CV</button>
@@ -66,11 +75,13 @@ const UserDashboard = ({ user }) => {
                             onCancel={handleCancelEdit}
                         />
                     )}
+                    {selectedCV && (
+                        <CVCustomizer cv={selectedCV} onExport={handleExport} />
+                    )}
                 </>
             )}
         </div>
     );
-    
 };
 
 export default UserDashboard;
