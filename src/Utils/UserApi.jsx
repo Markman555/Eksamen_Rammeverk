@@ -20,17 +20,6 @@ export const fetchUsers = async () => {
     }
 };
 
-
-// Hent en bruker etter ID. Kanskje slett?
-export const fetchUserById = async (id) => {
-    const response = await fetch(`${BASE_URL}/users/${id}`);
-    if (!response.ok) {
-        throw new Error("Kunne ikke hente bruker");
-    }
-    return await response.json();
-};
-
-
 export const createUser = async (user) => {
 
     const response = await fetch(`${BASE_URL}/users`, {
@@ -41,7 +30,6 @@ export const createUser = async (user) => {
         body: JSON.stringify(user),
     });
 
-    // Logg serverens svar
     const responseData = await response.json();
     console.log("Serverens svar:", responseData);
 
@@ -69,22 +57,16 @@ export const updateUser = async (id, updatedData) => {
         throw new Error("Kunne ikke oppdatere bruker");
     }
 
-    if (response.status === 204) {
-        console.log("Serveren returnerte ingen innhold (204)");
-        return {};  // Returner et tomt objekt
-    }
 
     const responseText = await response.text();
     console.log("Responsinnhold:", responseText);
 
     if (responseText.trim() === "") {
-        console.log("Serveren returnerte ingen data.");
-        return {};  // Returner et tomt objekt hvis responsen er tom
+        return {};  
     }
 
     try {
         const responseData = JSON.parse(responseText);
-        console.log("Responsdata etter oppdatering:", responseData);
         return responseData;
     } catch (error) {
         console.error("Kunne ikke parse JSON:", error);
@@ -102,8 +84,4 @@ export const deleteUser = async (id) => {
         throw new Error("Kunne ikke slette bruker");
     }
 };
-//Kanskje slett?
-export const fetchUserByUsername = async (username) => {
-    const users = await fetchUsers();
-    return users.find((u) => u.username === username);
-};
+
