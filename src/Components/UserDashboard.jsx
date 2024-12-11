@@ -13,6 +13,8 @@ const UserDashboard = () => {
     const [isCreating, setIsCreating] = useState(false);
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [viewingCV, setViewingCV] = useState(null);
+    const [customizingCV, setCustomizingCV] = useState(null);
+    const [hoveredCV, setHoveredCV] = useState(null);
 
     const handleCreateNewCV = () => {
         setSelectedCV(null);
@@ -32,57 +34,92 @@ const UserDashboard = () => {
         setIsFormVisible(false);
     };
 
-    const handleExport = (cv) => {
-        exportToPDF(cv);
+    const handleSave = (cvData) => {
+        if (isCreating) {
+            addCV(cvData);
+        } else {
+            updateCV(selectedCV._id, cvData);
+        }
+        setIsFormVisible(false);
     };
-// Legg til handleSave
 
     return (
         <div>
-          <div className="dashboard-header">
-            <h2>Mine CVer</h2>
-             <button onClick={logout}>Logg ut</button>
-           </div>
+            <div className="dashboard-header">
+                <h2>Mine CVer</h2>
+                <button className="action-btn" onClick={logout}>Logg ut</button>
+            </div>
             {loading && <p>Laster...</p>}
             {error && <p>Error: {error}</p>}
             {viewingCV ? (
-                <>
+                <div>
                     <CVView cv={viewingCV} onClose={() => setViewingCV(null)} />
-                    <CVCustomizer cv={viewingCV} onExport={handleExport} />
-                </>
+                </div>
             ) : (
                 <>
-                    <button onClick={handleCreateNewCV}>Opprett ny CV</button>
-                    <ul>
-                        {cvs.map((cv) => (
-                            <li key={cv._id}>
-                                <h3
-                                    onClick={() => setViewingCV(cv)}
-                                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    <button className="action-btn" onClick={handleCreateNewCV}>Opprett ny CV</button>
+                    {!isFormVisible && (
+                        <ul className="cv-list">
+                            {cvs.map((cv) => (
+                                <li
+                                    key={cv._id}
+                                    className={`cv-item ${hoveredCV === cv._id ? "hovered" : ""}`}
+                                    onMouseEnter={() => setHoveredCV(cv._id)}
+                                    onMouseLeave={() => setHoveredCV(null)}
                                 >
-                                    {cv.personalInfo?.name || "Ukjent navn"}
-                                </h3>
-                                <button onClick={() => handleEditCV(cv)}>Rediger</button>
-                                <button onClick={() => deleteCV(cv._id)}>Slett</button>
-                            </li>
-                        ))}
-                    </ul>
+                                    <h3
+                                        onClick={() => setViewingCV(cv)}
+                                        className="cv-title"
+                                    >
+                                        {cv.personalInfo?.name || "Ukjent navn"}
+                                    </h3>
+                                    {hoveredCV === cv._id && (
+                                        <div className="cv-actions">
+                                            <button
+                                                className="action-btn"
+                                                onClick={() => setViewingCV(cv)}
+                                            >
+                                                Se CV
+                                            </button>
+                                            <button
+                                                className="action-btn"
+                                                onClick={() => handleEditCV(cv)}
+                                            >
+                                                Rediger
+                                            </button>
+                                            <button
+                                                className="action-btn"
+                                                onClick={() => setCustomizingCV(cv)}
+                                            >
+                                                Tilpass CV
+                                            </button>
+                                            <button
+                                                className="action-btn"
+                                                onClick={() => deleteCV(cv._id)}
+                                            >
+                                                Slett
+                                            </button>
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                     {isFormVisible && (
                         <CVForm
                             initialData={isCreating ? null : selectedCV}
-                            onSave={(cvData) => {
-                                if (isCreating) {
-                                    addCV(cvData);
-                                } else {
-                                    updateCV(selectedCV._id, cvData);
-                                }
-                                setIsFormVisible(false);
-                            }}
+                            onSave={handleSave}
                             onCancel={handleCancelEdit}
                         />
                     )}
-                    {selectedCV && (
-                        <CVCustomizer cv={selectedCV} onExport={handleExport} />
+                    {customizingCV && (
+                        <div className="cv-customizer">
+                            <CVCustomizer 
+                                cv={customizingCV} 
+                                onExport={(cvData) => exportToPDF(cvData)} 
+                                onClose={() => setCustomizingCV(null)} 
+                            />
+                        </div>
                     )}
                 </>
             )}

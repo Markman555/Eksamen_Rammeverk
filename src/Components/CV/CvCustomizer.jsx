@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const CVCustomizer = ({ cv, onExport }) => {
+const CVCustomizer = ({ cv, onExport, onClose }) => {
     const [selectedSkills, setSelectedSkills] = useState(new Set(cv.skills));
     const [selectedExperience, setSelectedExperience] = useState(new Set(cv.experience));
     const [selectedEducation, setSelectedEducation] = useState(new Set(cv.education));
@@ -75,6 +75,7 @@ const CVCustomizer = ({ cv, onExport }) => {
             })}>
                 Eksporter til PDF
             </button>
+            <button onClick={onClose} className="close-btn">Close</button>
         </div>
     );
 };

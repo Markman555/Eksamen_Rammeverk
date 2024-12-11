@@ -25,5 +25,56 @@ h3:hover {
   justify-content: space-between;
   align-items: center;
 }
+/* Fjern standard listepunkter */
+ul.cv-list {
+  list-style-type: none;
+  padding: 0;
+}
 
+/* Styling for hver CV i listen */
+ul.cv-list .cv-item {
+  position: relative;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
 
+/* Bakgrunnsfarge endres når man hoverer */
+ul.cv-list .cv-item.hovered {
+  background-color: #f0f0f0;
+}
+
+/* Styling for CV-tittel (navn) */
+.cv-title {
+  margin: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Styling for handlingene (Se, Tilpass, Rediger, Slett) */
+.cv-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+/* Styling for handlingene (knappene) */
+.cv-actions .action-btn {
+  padding: 5px 10px;
+  cursor: pointer;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Endre farge når man holder musen over knappene */
+.cv-actions .action-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Styling for Rediger-skjemaet som vises under hvert element */
+.cv-edit-form {
+  margin-top: 10px;
+}
