@@ -43,26 +43,22 @@ export const updateCVById = async (cvId, cvData) => {
         });
 
         if (response.status === 200) {
-            console.log("CV updated successfully");
-            return true; // Returner true for å indikere at oppdateringen er vellykket
+            return true; 
         } else {
-            console.error(`Failed to update CV: ${response.statusText}`);
-            return false; // Returner false hvis statusen ikke er 200
+            return false; 
         }
     } catch (error) {
-        console.error("Error updating CV:", error);
-        throw error; // Kaster feilen videre
+        console.error("Error updating CV:", error); 
+        throw error; 
     }
 };
+
 
 export const deleteCVById = async (cvId) => {
     try {
         const response = await fetch(`${BASE_URL}/cvs/${cvId}`, {
             method: "DELETE",
         });
-        if (!response.ok) {
-            throw new Error(`Failed to delete CV: ${response.status}`);
-        }
     } catch (error) {
         console.error("Error deleting CV:", error);
         throw error;
