@@ -53,6 +53,7 @@ Login as admin with username: admin and password: admin
    2. ProtectedRoute sørger for at det er bruker med riktig rolle for å få tilgang til enten admin-dashboard eller user-dashboard.
    3. UserDashboard er for vanlig bruker skal kunne opprette, se, oppdatere og slette et eller flere CV. Alle CV bruker oppretter vil admin få tilgang til å kunne se, redigere, tilpasse til pdf eller slette fra databasen. 
       * Bruker kan kun se CV de selv har laget, ved å legge inn en Created By: username i objektet som blir lagret i databasen.
+        
 **Andre Mapper**
 1. Context: AuthContext kontrollerer hvilken bruker logger på og passerer ned logout funksjonalitet, samt finner brukere fra databasen over opprettede brukere som admin er ansvarlig for.
 2. Style: Hover effekter og standard vite styling til utseendet på nettsiden. 
