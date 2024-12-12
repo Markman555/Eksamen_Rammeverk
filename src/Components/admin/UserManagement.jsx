@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { fetchUsers, createUser, deleteUser, updateUser } from "../../Utils/UserApi";
+import ConfirmationModal from "../UI-Popup/ConfirmationModal";
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [newUser, setNewUser] = useState({ username: "", password: "", email: "", role: "user" });
     const [editingUserId, setEditingUserId] = useState(null);
     const [editingUser, setEditingUser] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+const [userToDelete, setUserToDelete] = useState(null);
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -35,16 +38,31 @@ const UserManagement = () => {
         }
     };
 
-    const handleDeleteUser = async (id) => {
+    const handleDeleteUser = (id) => {
+        const user = users.find((user) => user._id === id);
+        setUserToDelete(user);
+        setShowModal(true);
+    };
+    
+    const confirmDeleteUser = async () => {
+        if (!userToDelete) return;
+    
         try {
-            await deleteUser(id);
-            const data = await fetchUsers();
-            setUsers(data);
+            await deleteUser(userToDelete._id);
+            const updatedUsers = users.filter((user) => user._id !== userToDelete._id);
+            setUsers(updatedUsers);
         } catch (error) {
             console.error(error.message);
+        } finally {
+            setShowModal(false);
+            setUserToDelete(null);
         }
     };
-
+    
+    const cancelDeleteUser = () => {
+        setShowModal(false);
+        setUserToDelete(null);
+    };
     const handleEditUser = (user) => {
         setEditingUserId(user._id);
         setEditingUser({ ...user });
@@ -150,6 +168,13 @@ const UserManagement = () => {
                     </li>
                 ))}
             </ul>
+            {showModal && (
+               <ConfirmationModal
+                message={`Er du sikker på at du vil slette brukeren ${userToDelete?.username}?`}
+                onConfirm={confirmDeleteUser}
+                onCancel={cancelDeleteUser}
+               />
+              )}
         </div>
     );
 };
