@@ -24,8 +24,8 @@ export const AuthProvider = ({ children }) => {
         }
     
         try {
-            const users = await fetchUsers(); // Hent alle brukerne
-            const foundUser = users.find((u) => u.username === username); // Finn brukeren basert på username
+            const users = await fetchUsers();
+            const foundUser = users.find((u) => u.username === username); 
     
             console.log("Found user:", foundUser);
     
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        console.log("User has been set:", user); // Debugging log
+        console.log("User has been set:", user); 
     }, [user]);
 
     return (

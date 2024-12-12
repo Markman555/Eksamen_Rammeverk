@@ -8,7 +8,7 @@ const UserManagement = () => {
     const [editingUserId, setEditingUserId] = useState(null);
     const [editingUser, setEditingUser] = useState(null);
     const [showModal, setShowModal] = useState(false);
-const [userToDelete, setUserToDelete] = useState(null);
+    const [userToDelete, setUserToDelete] = useState(null);
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -58,11 +58,12 @@ const [userToDelete, setUserToDelete] = useState(null);
             setUserToDelete(null);
         }
     };
-    
+
     const cancelDeleteUser = () => {
         setShowModal(false);
         setUserToDelete(null);
-    };
+    };  
+    
     const handleEditUser = (user) => {
         setEditingUserId(user._id);
         setEditingUser({ ...user });
