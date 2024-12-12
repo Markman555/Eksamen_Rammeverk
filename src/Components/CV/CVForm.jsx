@@ -8,222 +8,161 @@ const existingInstitutions = [
     "Universitetet i Bergen",
 ];
 
+const existingSkills = [
+    "JavaScript",
+    "React",
+    "Node.js",
+    "Python",
+    "Java",
+    "C#",
+    "HTML",
+    "CSS",
+    "SQL",
+    "Docker",
+    "Kubernetes",
+    "Git",
+];
+
 const CVForm = ({ initialData, onSave, onCancel }) => {
     const [formData, setFormData] = useState({
-        personalInfo: {
-            name: "",
-            email: "",
-            phone: "",
-        },
+        personalInfo: { name: "", email: "", phone: "" },
         skills: [],
         education: [],
         experience: [],
         references: [],
     });
-
-    const [institutionSuggestions, setInstitutionSuggestions] = useState([]);
-    const [selectedInstitution, setSelectedInstitution] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [suggestions, setSuggestions] = useState({ skills: [], institutions: [] });
 
     useEffect(() => {
-        if (initialData) {
-            setFormData(initialData);
-        }
+        if (initialData) setFormData(initialData);
     }, [initialData]);
 
-    const handlePersonalInfoChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            personalInfo: {
-                ...prev.personalInfo,
-                [name]: value,
-            },
-        }));
-    };
+    const updateFormField = (field, value) =>
+        setFormData((prev) => ({ ...prev, [field]: value }));
 
-    const handleSkillChange = (index, value) => {
-        setFormData((prev) => ({
-            ...prev,
-            skills: prev.skills.map((skill, i) => (i === index ? value : skill)),
-        }));
-    };
+    const handleNestedChange = (field, index, key, value) =>
+        updateFormField(
+            field,
+            formData[field].map((item, i) => (i === index ? { ...item, [key]: value } : item))
+        );
 
-    const handleAddSkill = () => {
-        setFormData((prev) => ({
-            ...prev,
-            skills: [...prev.skills, ""],
-        }));
-    };
+    const handleAddItem = (field, newItem) =>
+        updateFormField(field, [...formData[field], newItem]);
 
-    const handleRemoveSkill = (index) => {
-        setFormData((prev) => ({
-            ...prev,
-            skills: prev.skills.filter((_, i) => i !== index),
-        }));
-    };
+    const handleRemoveItem = (field, index) =>
+        updateFormField(field, formData[field].filter((_, i) => i !== index));
 
-    const handleArrayChange = (field, index, key, value) => {
-        setFormData((prev) => ({
+    const handleSearch = (type, term) => {
+        setSearchTerm(term);
+        const list = type === "skills" ? existingSkills : existingInstitutions;
+        setSuggestions((prev) => ({
             ...prev,
-            [field]: prev[field].map((item, i) =>
-                i === index ? { ...item, [key]: value } : item
+            [type]: list.filter((item) =>
+                item.toLowerCase().includes(term.toLowerCase())
             ),
         }));
     };
 
-    const handleAddItem = (field, newItem) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: [...prev[field], newItem],
-        }));
+    const handleSuggestionSelect = (type, value, index = null) => {
+        setSearchTerm("");
+        setSuggestions((prev) => ({ ...prev, [type]: [] }));
+        if (type === "skills") {
+            if (!formData.skills.includes(value))
+                updateFormField("skills", [...formData.skills, value]);
+        } else if (type === "institutions" && index !== null) {
+            handleNestedChange("education", index, "institution", value);
+        }
     };
 
-    const handleRemoveItem = (field, index) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: prev[field].filter((_, i) => i !== index),
-        }));
-    };
+    const renderListItems = (field, structure, placeholder) =>
+        formData[field].map((item, index) => (
+            <div key={index}>
+                {Object.keys(structure).map((key) => (
+                    <input
+                        key={key}
+                        type="text"
+                        placeholder={structure[key]}
+                        value={item[key] || ""}
+                        onChange={(e) =>
+                            handleNestedChange(field, index, key, e.target.value)
+                        }
+                    />
+                ))}
+                <button
+                    type="button"
+                    onClick={() => handleRemoveItem(field, index)}
+                >
+                    Remove
+                </button>
+            </div>
+        ));
 
     const handleSubmit = (e) => {
         e.preventDefault();
         onSave(formData);
     };
 
-    const handleInstitutionChange = (e, index) => {
-        const value = e.target.value;
-        setSelectedInstitution(value);
-        if (value) {
-            const filteredSuggestions = existingInstitutions.filter((institution) =>
-                institution.toLowerCase().includes(value.toLowerCase())
-            );
-            setInstitutionSuggestions(filteredSuggestions);
-        } else {
-            setInstitutionSuggestions([]);
-        }
-
-        setFormData((prev) => {
-            const updatedEducation = [...prev.education];
-            updatedEducation[index] = {
-                ...updatedEducation[index],
-                institution: value,
-            };
-            return {
-                ...prev,
-                education: updatedEducation,
-            };
-        });
-    };
-
-    const handleInstitutionSelect = (institution, index) => {
-        setSelectedInstitution(institution);
-        setInstitutionSuggestions([]); 
-  
-        setFormData((prev) => {
-            const updatedEducation = [...prev.education];
-            updatedEducation[index] = {
-                ...updatedEducation[index],
-                institution: institution,
-            };
-            return {
-                ...prev,
-                education: updatedEducation,
-            };
-        });
-    };
-
     return (
         <form onSubmit={handleSubmit}>
             <h2>{initialData ? "Edit CV" : "Create CV"}</h2>
+
             <h4>Personal Info</h4>
-            <label>
-                Name:
-                <input
-                    type="text"
-                    name="name"
-                    value={formData.personalInfo.name}
-                    onChange={handlePersonalInfoChange}
-                />
-            </label>
-            <label>
-                Email:
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.personalInfo.email}
-                    onChange={handlePersonalInfoChange}
-                />
-            </label>
-            <label>
-                Phone:
-                <input
-                    type="text"
-                    name="phone"
-                    value={formData.personalInfo.phone}
-                    onChange={handlePersonalInfoChange}
-                />
-            </label>
+            {["name", "email", "phone"].map((key) => (
+                <label key={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:
+                    <input
+                        type={key === "email" ? "email" : "text"}
+                        name={key}
+                        value={formData.personalInfo[key]}
+                        onChange={(e) =>
+                            updateFormField("personalInfo", {
+                                ...formData.personalInfo,
+                                [e.target.name]: e.target.value,
+                            })
+                        }
+                    />
+                </label>
+            ))}
 
             <h4>Skills</h4>
-            {formData.skills.map((skill, index) => (
-                <div key={index}>
-                    <input
-                        type="text"
-                        value={skill}
-                        onChange={(e) => handleSkillChange(index, e.target.value)}
-                    />
-                    <button type="button" onClick={() => handleRemoveSkill(index)}>
-                        Remove
-                    </button>
+            <input
+                type="text"
+                placeholder="Search for skills"
+                value={searchTerm}
+                onChange={(e) => handleSearch("skills", e.target.value)}
+            />
+            {suggestions.skills.length > 0 && (
+                <div className="suggestions">
+                    {suggestions.skills.map((skill, i) => (
+                        <div
+                            key={i}
+                            onClick={() => handleSuggestionSelect("skills", skill)}
+                        >
+                            {skill}
+                        </div>
+                    ))}
                 </div>
-            ))}
-            <button type="button" onClick={handleAddSkill}>
-                Add Skill
-            </button>
+            )}
+            <div>
+                {formData.skills.map((skill, i) => (
+                    <div key={i}>
+                        {skill}
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveItem("skills", i)}
+                        >
+                            Remove
+                        </button>
+                    </div>
+                ))}
+            </div>
 
             <h4>Education</h4>
-            {formData.education.map((education, index) => (
-                <div key={index}>
-                    <input
-                        type="text"
-                        placeholder="Institution"
-                        value={education.institution || selectedInstitution}
-                        onChange={(e) => handleInstitutionChange(e, index)}
-                    />
-                    {institutionSuggestions.length > 0 && (
-                        <div className="institution-suggestions">
-                            {institutionSuggestions.map((institution, idx) => (
-                                <div
-                                    key={idx}
-                                    className="suggestion-item"
-                                    onClick={() => handleInstitutionSelect(institution, index)}
-                                >
-                                    {institution}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    <input
-                        type="text"
-                        placeholder="Degree"
-                        value={education.degree || ""}
-                        onChange={(e) =>
-                            handleArrayChange("education", index, "degree", e.target.value)
-                        }
-                    />
-                    <input
-                        type="text"
-                        placeholder="Year"
-                        value={education.year || ""}
-                        onChange={(e) =>
-                            handleArrayChange("education", index, "year", e.target.value)
-                        }
-                    />
-                    <button type="button" onClick={() => handleRemoveItem("education", index)}>
-                        Remove
-                    </button>
-                </div>
-            ))}
+            {renderListItems(
+                "education",
+                { institution: "Institution", degree: "Degree", year: "Year" }
+            )}
             <button
                 type="button"
                 onClick={() =>
@@ -234,37 +173,10 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
             </button>
 
             <h4>Experience</h4>
-            {formData.experience.map((experience, index) => (
-                <div key={index}>
-                    <input
-                        type="text"
-                        placeholder="Title"
-                        value={experience.title || ""}
-                        onChange={(e) =>
-                            handleArrayChange("experience", index, "title", e.target.value)
-                        }
-                    />
-                    <input
-                        type="text"
-                        placeholder="Company"
-                        value={experience.company || ""}
-                        onChange={(e) =>
-                            handleArrayChange("experience", index, "company", e.target.value)
-                        }
-                    />
-                    <input
-                        type="text"
-                        placeholder="Years"
-                        value={experience.years || ""}
-                        onChange={(e) =>
-                            handleArrayChange("experience", index, "years", e.target.value)
-                        }
-                    />
-                    <button type="button" onClick={() => handleRemoveItem("experience", index)}>
-                        Remove
-                    </button>
-                </div>
-            ))}
+            {renderListItems(
+                "experience",
+                { title: "Title", company: "Company", years: "Years" }
+            )}
             <button
                 type="button"
                 onClick={() =>
@@ -275,29 +187,10 @@ const CVForm = ({ initialData, onSave, onCancel }) => {
             </button>
 
             <h4>References</h4>
-            {formData.references.map((reference, index) => (
-                <div key={index}>
-                    <input
-                        type="text"
-                        placeholder="Name"
-                        value={reference.name || ""}
-                        onChange={(e) =>
-                            handleArrayChange("references", index, "name", e.target.value)
-                        }
-                    />
-                    <input
-                        type="text"
-                        placeholder="Contact Info"
-                        value={reference.contactInfo || ""}
-                        onChange={(e) =>
-                            handleArrayChange("references", index, "contactInfo", e.target.value)
-                        }
-                    />
-                    <button type="button" onClick={() => handleRemoveItem("references", index)}>
-                        Remove
-                    </button>
-                </div>
-            ))}
+            {renderListItems(
+                "references",
+                { name: "Name", contactInfo: "Contact Info" }
+            )}
             <button
                 type="button"
                 onClick={() =>
